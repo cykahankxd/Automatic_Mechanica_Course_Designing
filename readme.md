@@ -11,11 +11,3 @@
 ### 功能
 
 目前仅实现电动机的选择（待完善），期待有dalao能issue纠错或补充
-
-### 如何参与开发
-
-你可以通过向开发者提出申请来参与开发，或者直接向开发者提交补充文件等，你也可以通过issue提出合理建议，或纠正程序的错误。
-
-交流群：NEFU_AutoMachanic(901252688)，验证回答github即可
-
-项目链接：[开罐即食](https://github.com/cykahankxd/Automatic_Mechanica_Course_Designing)
