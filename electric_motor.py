@@ -24,16 +24,17 @@ def motor_use(motor_final, i_final):  # 测算实际选用电动机后机构的�
     global i_total
     global i_belt
     global i_gear
+    global P_output
     # 确定电机及其物理学参数
     print("  最终选用电机为" + motor_final[0])
     n_machine[0] = motor_final[2]
     T_machine[0] = motor_final[3]
-    P_machine[0] = motor_final[1]
+    P_machine[0] = P_output
     print("·电机相关详情请翻阅《机械设计课程设计》（北京大学出版社）168页")
     # 确定传动比
     i_total = i_final
-    i_belt = np.sqrt(i_total * 1.4)
-    i_gear = i_total / i_belt
+    i_gear = np.sqrt(i_total * 1.4)
+    i_belt = i_total / i_gear
     print("·计算各级传动比:")
     print("  总传动比为: %.2f" % i_total)
     print("  V带传动比为: %.2f" % i_belt)
@@ -49,7 +50,7 @@ def motor_use(motor_final, i_final):  # 测算实际选用电动机后机构的�
     # 各级输入功率
     P_machine[1] = P_machine[0] * efficiency_belt
     P_machine[2] = P_machine[1] * efficiency_gear * efficiency_bearing
-    P_machine[3] = P_machine[2] * efficiency_coupling * efficiency_roller
+    P_machine[3] = P_machine[2] * efficiency_coupling * efficiency_bearing
     print("·计算各级输入功率:")
     print("  电机轴输入功率为: %.2f" % P_machine[0])
     print("  减速器高速轴输入功率为: %.2f" % P_machine[1])
@@ -70,10 +71,10 @@ def motor_scan():  # 选择你的电动机
     global P_work
     global P_output
     # 所有电机数据导入
-    all_list_1000r = pd.read_excel('all_motors.xls', sheet_name="Sheet1")  # 导入千转电机数据
+    all_list_1000r = pd.read_excel('./all_sheets/all_motors.xls', sheet_name="Sheet1")  # 导入千转电机数据
     train_data = np.array(all_list_1000r)
     all_list_1000r = train_data.tolist()
-    all_list_1500r = pd.read_excel('all_motors.xls', sheet_name="Sheet2")  # 导入1.5k电机数据
+    all_list_1500r = pd.read_excel('./all_sheets/all_motors.xls', sheet_name="Sheet2")  # 导入1.5k电机数据
     train_data = np.array(all_list_1500r)
     all_list_1500r = train_data.tolist()
     # 根据功率挑选合适电机
@@ -94,7 +95,7 @@ def motor_scan():  # 选择你的电动机
     print("  方案2(1500转): " + motor_1500r[0] + ",", "额定功率" + str(motor_1500r[1]) + "kW,",
           "满载转速" + str(motor_1500r[2]) + "r/min")
     # 这里的参数可修改，如果高转速优先就用1500r，如果经济优先就用1000r
-    high_motorspeed_tag = 1  # 测试用
+    # high_motorspeed_tag = 1  # 测试用
     if high_motorspeed_tag == 1 and n_work * 24 > 1500:
         motor_use(motor_1500r, motor_1500r[2]/n_work)
     else:
