@@ -9,7 +9,7 @@ class Auto_Class_Design(tk.Tk):
         self.title("Class Design Auto Spawner")
         self.geometry("240x235")
 
-    def motor_connect(self):
+    # def motor_connect(self):
 
 
 

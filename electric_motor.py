@@ -25,12 +25,14 @@ def motor_use(motor_final, i_final):  # 测算实际选用电动机后机构的�
     global i_belt
     global i_gear
     global P_output
+
     # 确定电机及其物理学参数
     print("  最终选用电机为" + motor_final[0])
     n_machine[0] = motor_final[2]
     T_machine[0] = motor_final[3]
     P_machine[0] = P_output
     print("·电机相关详情请翻阅《机械设计课程设计》（北京大学出版社）168页")
+
     # 确定传动比
     i_total = i_final
     i_gear = np.sqrt(i_total * 1.4)
@@ -39,6 +41,7 @@ def motor_use(motor_final, i_final):  # 测算实际选用电动机后机构的�
     print("  总传动比为: %.2f" % i_total)
     print("  V带传动比为: %.2f" % i_belt)
     print("  齿轮传动比为: %.2f" % i_gear)
+
     # 各级转速
     n_machine[1] = n_machine[0] / i_belt
     n_machine[3] = n_machine[2] = n_machine[1] / i_gear
@@ -47,6 +50,7 @@ def motor_use(motor_final, i_final):  # 测算实际选用电动机后机构的�
     print("  减速器高速轴转速为: %.2f" % n_machine[1])
     print("  减速器低速轴转速为: %.2f" % n_machine[2])
     print("  滚筒转速为: %.2f" % n_machine[3])
+
     # 各级输入功率
     P_machine[1] = P_machine[0] * efficiency_belt
     P_machine[2] = P_machine[1] * efficiency_gear * efficiency_bearing
@@ -56,6 +60,7 @@ def motor_use(motor_final, i_final):  # 测算实际选用电动机后机构的�
     print("  减速器高速轴输入功率为: %.2f" % P_machine[1])
     print("  减速器低速轴输入功率为: %.2f" % P_machine[2])
     print("  滚筒输入功率为: %.2f" % P_machine[3])
+
     # 各级转矩
     for i in range(4):
         T_machine[i] = 9550 * P_machine[i] / n_machine[i]
@@ -68,8 +73,10 @@ def motor_use(motor_final, i_final):  # 测算实际选用电动机后机构的�
 
 
 def motor_scan():  # 选择你的电动机
+
     global P_work
     global P_output
+
     # 所有电机数据导入
     all_list_1000r = pd.read_excel('./all_sheets/all_motors.xls', sheet_name="Sheet1")  # 导入千转电机数据
     train_data = np.array(all_list_1000r)
@@ -77,6 +84,7 @@ def motor_scan():  # 选择你的电动机
     all_list_1500r = pd.read_excel('./all_sheets/all_motors.xls', sheet_name="Sheet2")  # 导入1.5k电机数据
     train_data = np.array(all_list_1500r)
     all_list_1500r = train_data.tolist()
+
     # 根据功率挑选合适电机
     list_tag = 1
     motor_1000r = all_list_1000r[list_tag]
@@ -88,6 +96,7 @@ def motor_scan():  # 选择你的电动机
     while motor_1500r[1] < P_output:
         list_tag += 1
         motor_1500r = all_list_1500r[list_tag]
+
     # 输出电机参数
     print("·电机方案如下:")
     print("  方案1(千转): " + motor_1000r[0] + ",", "额定功率" + str(motor_1000r[1]) + "kW,",
@@ -95,6 +104,7 @@ def motor_scan():  # 选择你的电动机
     print("  方案2(1500转): " + motor_1500r[0] + ",", "额定功率" + str(motor_1500r[1]) + "kW,",
           "满载转速" + str(motor_1500r[2]) + "r/min")
     # 这里的参数可修改，如果高转速优先就用1500r，如果经济优先就用1000r
+
     # high_motorspeed_tag = 1  # 测试用
     if high_motorspeed_tag == 1 and n_work * 24 > 1500:
         motor_use(motor_1500r, motor_1500r[2]/n_work)
@@ -124,14 +134,17 @@ def output_MotorAbout():  # 输出相关参数并存储到config中，等待二�
     config["Machine"]["T_highspeed"] = str(T_machine[1])
     config["Machine"]["T_lowspeed"] = str(T_machine[2])
     config["Machine"]["T_output"] = str(T_machine[3])
+
     with open("./config.ini", "w") as configfile:
         config.write(configfile)
 
 
 def cal_motor():
+
     global P_work
     global P_output
     global n_work
+
     # 计算电机理论功率及转速
     P_work = F_belt * V_belt / 1000
     P_output = P_work / efficiency_total
@@ -146,9 +159,11 @@ def cal_motor():
 
 
 if __name__ == "__main__":
+
     # 导入config
     config = cp.ConfigParser()
     config.read("./config.ini")
+
     # 数据记录
     efficiency_belt = float(config["General"]["efficiency_belt"])  # V带传输效率
     efficiency_bearing = float(config["General"]["efficiency_bearing"])  # 轴承传输效率
@@ -160,6 +175,7 @@ if __name__ == "__main__":
     V_belt = float(config["General"]["V_belt"])  # 运输带工作速度
     D_roller = float(config["General"]["D_roller"])  # 滚筒直径
     high_motorspeed_tag = int(config["General"]["high_motorspeed_tag"])  # 是否选择高速优先
+
     # 将数据输出到可视文件中
     output_file = open("Calculated_Data.txt", mode='w+')
     temp = sys.stdout
