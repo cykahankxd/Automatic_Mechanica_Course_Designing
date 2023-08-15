@@ -244,7 +244,7 @@ def aft_design():  # 计算其它部件参数
     F_pull_0 = 500 * P_design / (belt_sum * belt_speed) * (2.5 / K_alpha - 1) + mass_per_unit * (belt_speed ** 2)
     F_Q = 2 * F_pull_0 * belt_sum * np.sin(np.radians(alpha_small) / 2)
 
-    # 初定轴控径及轮毂宽度
+    # 初定轴孔径及轮毂宽度
     d_small_wheel_shaft = 106 * np.cbrt(P_motor / n_motor) * 1.03
     d_large_wheel_shaft = 106 * np.cbrt(P_highspeed / n_highspeed) * 1.03
 
