@@ -146,7 +146,7 @@ def base_length_design():  # 选择V带基准长度
     # 初定中心距及带基准长度
     center_distance_0 = 1.3 * (d_small + d_large)
     belt_base_len_0 = 2 * center_distance + pi * (d_small + d_large) / 2 + ((d_large - d_small) ** 2) / (
-                4 * center_distance_0)
+            4 * center_distance_0)
 
     # 由表取标准值进行更正
     row = 4 if belt_type == 'A' else 2
@@ -245,8 +245,8 @@ def aft_design():  # 计算其它部件参数
     F_Q = 2 * F_pull_0 * belt_sum * np.sin(np.radians(alpha_small) / 2)
 
     # 初定轴孔径及轮毂宽度
-    d_small_wheel_shaft = 106 * np.cbrt(P_motor / n_motor) * 1.03
-    d_large_wheel_shaft = 106 * np.cbrt(P_highspeed / n_highspeed) * 1.03
+    d_small_wheel_shaft = 110 * np.cbrt(P_motor / n_motor) * 1.03
+    d_large_wheel_shaft = 110 * np.cbrt(P_highspeed / n_highspeed) * 1.03
 
     print("·结构设计计算")
     print("  V带单位长度质量查表得为: %.2f" % mass_per_unit)
@@ -284,7 +284,6 @@ def aft_design():  # 计算其它部件参数
 
 
 def output_BeltAbout():
-
     global belt_type
     global P_design
     global P_single_belt

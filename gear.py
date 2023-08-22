@@ -266,9 +266,9 @@ def gear_design():
     t_output = 9550 * p_output / n_output
 
     # 轴设计
-    d_gear_shaft_high += 6
+    d_gear_shaft_high += 12
     tag2 = 0
-    d_gear_shaft_low = 106 * np.cbrt(p_lowspeed / n_lowspeed) * 1.03
+    d_gear_shaft_low = 110 * np.cbrt(p_lowspeed / n_lowspeed) * 1.03
     for i in range(10, 26):
         if i > d_gear_shaft_low and tag2 == 0:
             d_gear_shaft_low = i
@@ -277,7 +277,7 @@ def gear_design():
         if i > d_gear_shaft_low and tag2 == 0:
             d_gear_shaft_low = i
             tag2 = 1
-    d_gear_shaft_low += 6
+    d_gear_shaft_low += 12
 
     print("·齿轮整体结构设计")
     print("  综上，得齿轮整体结构如下:")
