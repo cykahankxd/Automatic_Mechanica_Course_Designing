@@ -2,7 +2,6 @@ import configparser as cp
 import pandas as pd
 import numpy as np
 import sys
-from numpy import pi
 
 base_wall_thickness = 0.0  # 机座壁厚
 hood_wall_thickness = 0.0  # 机盖壁厚
@@ -13,7 +12,6 @@ base_rib_thickness = 0.0  # 机座肋厚
 hood_rib_thickness = 0.0  # 机盖肋厚
 boss_height = 0.0  # 轴承旁凸台高度
 boss_radius = 0.0  # 轴承旁凸台半径
-bearing_cover_diameter = 0.0  # 轴承端盖外径
 foundation_bolt_d = 0.0  # 地脚螺钉直径
 foundation_bolt_n = 0.0  # 地脚螺钉数目
 foundation_bolt_PTH_d = 0.0  # 地脚螺钉通孔直径
@@ -35,24 +33,22 @@ dowel_pin_d = 0.0  # 定位销直径
 bearing_cover_bolt_d = 0.0  # 轴承盖螺钉直径
 seeker_cover_bolt_d = 0.0  # 窥视孔盖螺钉直径
 length_1 = 0.0  # 机体外壁至轴承座断面的距离
+length_2 = 0.0  # 机体内壁至轴承座断面的距离
 delta_1 = 0.0  # 大齿轮顶圆与机体内壁的距离
 delta_2 = 0.0  # 齿轮端面与机体内壁的距离
-
-
-# def shaft_about():
 
 
 def structure_design():
 
     global base_wall_thickness, hood_wall_thickness, base_flange_thickness, hood_flange_thickness, \
-        foundation_flange_thickness, base_rib_thickness, hood_rib_thickness, bearing_cover_diameter, \
+        foundation_flange_thickness, base_rib_thickness, hood_rib_thickness, \
         foundation_bolt_d, foundation_bolt_n, foundation_bolt_seat_d, \
         foundation_bolt_PTH_d, foundation_flange_c1, foundation_flange_c2, \
         bearing_connection_bolt_d, bearing_connection_bolt_seat_d, \
         bearing_connection_bolt_PTH_d, bearing_connection_flange_c1, bearing_connection_flange_c2, \
         shell_connection_bolt_d, shell_connection_bolt_seat_d, \
         shell_connection_bolt_PTH_d, shell_connection_flange_c1, shell_connection_flange_c2, \
-        dowel_pin_d, bearing_cover_bolt_d, seeker_cover_bolt_d, length_1, delta_1, delta_2, boss_radius
+        dowel_pin_d, bearing_cover_bolt_d, seeker_cover_bolt_d, length_1, length_2, delta_1, delta_2, boss_radius
 
     # 初步计算参数
     base_wall_thickness = 0.03 * center_distance if 0.03 * center_distance >= 8 else 8
@@ -124,8 +120,18 @@ def structure_design():
     # 其余参数
     dowel_pin_d = np.ceil(0.7 * shell_connection_bolt_d)
     bearing_cover_bolt_d = np.ceil(0.4 * foundation_bolt_d)
+    for i in range(1, len(standard_bolt[0])):
+        if standard_bolt[0][i] > bearing_cover_bolt_d:
+            bearing_cover_bolt_d = standard_bolt[0][i] if abs(bearing_cover_bolt_d - standard_bolt[0][i]) < \
+                    abs(bearing_cover_bolt_d - standard_bolt[0][i-1]) else standard_bolt[0][i-1]
+            break
     seeker_cover_bolt_d = np.ceil(0.3 * foundation_bolt_d)
+    for i in range(1, len(standard_bolt[0])):
+        if standard_bolt[0][i] > seeker_cover_bolt_d:
+            seeker_cover_bolt_d = standard_bolt[0][i] if abs(seeker_cover_bolt_d - standard_bolt[0][i]) < \
+                    abs(seeker_cover_bolt_d - standard_bolt[0][i-1]) else standard_bolt[0][i-1]
     length_1 = shell_connection_flange_c1 + shell_connection_flange_c2 + 6
+    length_2 = base_wall_thickness + length_1
     delta_1 = np.ceil(1.2 * base_wall_thickness)
     delta_2 = base_wall_thickness if 10 <= base_wall_thickness <= 15 else (10 if base_wall_thickness < 10 else 15)
     boss_radius = shell_connection_flange_c2
@@ -137,8 +143,7 @@ def structure_design():
     print("  机座 / 机盖 / 机器底座凸缘厚为: %.2f / %.2f / %.2f" % (base_flange_thickness, hood_wall_thickness,
                                                         foundation_flange_thickness))
     print("  机座 / 机盖肋板厚为: %.2f , %.2f" % (base_rib_thickness, hood_rib_thickness))
-    print("  轴承旁凸台半径为: %.2f" % bearing_cover_bolt_d)
-    print("  轴承盖外径为: %.2f" % boss_radius)
+    print("  轴承旁凸台半径为: %.2f" % boss_radius)
     print("·地脚螺钉尺寸")
     print("  直径: %.2f" % foundation_bolt_d)
     print("  数量: %.2f" % foundation_bolt_n)
@@ -155,21 +160,20 @@ def structure_design():
     print("  通孔直径: %.2f" % shell_connection_bolt_PTH_d)
     print("  沉头座直径: %.2f" % shell_connection_bolt_seat_d)
     print("  底座凸缘尺寸1 / 2: %.2f , %.2f" % (shell_connection_flange_c1, shell_connection_flange_c2))
-    print("·吊环螺钉尺寸")
     print("·其它组件")
     print("  定位销直径: %.2f" % dowel_pin_d)
     print("  轴承盖螺钉直径: %.2f" % bearing_cover_bolt_d)
     print("  窥视孔盖螺钉直径: %.2f" % seeker_cover_bolt_d)
     print("  机体外壁至轴承座端面的距离: %.2f" % length_1)
+    print("  机体内壁至轴承座端面的距离: %.2f" % length_2)
     print("  大齿轮顶圆与机体内壁的距离: %.2f" % delta_1)
     print("  齿轮端面与机体内壁的距离: %.2f" % delta_2)
-    print("------------------机箱结构运算已结束-------------------")
 
 
 def machine_about_output():
 
     global base_wall_thickness, hood_wall_thickness, base_flange_thickness, hood_flange_thickness, \
-        foundation_flange_thickness, base_rib_thickness, hood_rib_thickness, bearing_cover_diameter, \
+        foundation_flange_thickness, base_rib_thickness, hood_rib_thickness, \
         foundation_bolt_d, foundation_bolt_n, foundation_bolt_seat_d, \
         foundation_bolt_PTH_d, foundation_flange_c1, foundation_flange_c2, \
         bearing_connection_bolt_d, bearing_connection_bolt_seat_d, \
@@ -179,36 +183,39 @@ def machine_about_output():
         dowel_pin_d, bearing_cover_bolt_d, seeker_cover_bolt_d, length_1, delta_1, delta_2, boss_radius
 
     config["Machine"]["base_wall_thickness"] = str(base_wall_thickness)
-    config["Machine"]["base_wall_thickness"] = str(hood_wall_thickness)
-    config["Machine"]["base_wall_thickness"] = str(base_flange_thickness)
-    config["Machine"]["base_wall_thickness"] = str(hood_flange_thickness)
-    config["Machine"]["base_wall_thickness"] = str(foundation_flange_thickness)
-    config["Machine"]["base_wall_thickness"] = str(base_rib_thickness)
-    config["Machine"]["base_wall_thickness"] = str(hood_rib_thickness)
-    config["Machine"]["base_wall_thickness"] = str(boss_radius)
-    config["Machine"]["base_wall_thickness"] = str(bearing_cover_diameter)
-    config["Machine"]["base_wall_thickness"] = str(foundation_bolt_d)
-    config["Machine"]["base_wall_thickness"] = str(foundation_bolt_n)
-    config["Machine"]["base_wall_thickness"] = str(foundation_bolt_PTH_d)
-    config["Machine"]["base_wall_thickness"] = str(foundation_bolt_seat_d)
-    config["Machine"]["base_wall_thickness"] = str(foundation_flange_c1)
-    config["Machine"]["base_wall_thickness"] = str(foundation_flange_c2)
-    config["Machine"]["base_wall_thickness"] = str(bearing_connection_bolt_d)
-    config["Machine"]["base_wall_thickness"] = str(bearing_connection_bolt_PTH_d)
-    config["Machine"]["base_wall_thickness"] = str(bearing_connection_bolt_seat_d)
-    config["Machine"]["base_wall_thickness"] = str(bearing_connection_flange_c1)
-    config["Machine"]["base_wall_thickness"] = str(bearing_connection_flange_c2)
-    config["Machine"]["base_wall_thickness"] = str(shell_connection_bolt_d)
-    config["Machine"]["base_wall_thickness"] = str(shell_connection_bolt_PTH_d)
-    config["Machine"]["base_wall_thickness"] = str(shell_connection_bolt_seat_d)
-    config["Machine"]["base_wall_thickness"] = str(shell_connection_flange_c1)
-    config["Machine"]["base_wall_thickness"] = str(shell_connection_flange_c2)
-    config["Machine"]["base_wall_thickness"] = str(dowel_pin_d)
-    config["Machine"]["base_wall_thickness"] = str(bearing_cover_bolt_d)
-    config["Machine"]["base_wall_thickness"] = str(seeker_cover_bolt_d)
-    config["Machine"]["base_wall_thickness"] = str(length_1)
-    config["Machine"]["base_wall_thickness"] = str(delta_1)
-    config["Machine"]["base_wall_thickness"] = str(delta_2)
+    config["Machine"]["hood_wall_thickness"] = str(hood_wall_thickness)
+    config["Machine"]["base_flange_thickness"] = str(base_flange_thickness)
+    config["Machine"]["hood_flange_thickness"] = str(hood_flange_thickness)
+    config["Machine"]["foundation_flange_thickness"] = str(foundation_flange_thickness)
+    config["Machine"]["base_rib_thickness"] = str(base_rib_thickness)
+    config["Machine"]["hood_rib_thickness"] = str(hood_rib_thickness)
+    config["Machine"]["boss_radius"] = str(boss_radius)
+    config["Machine"]["foundation_bolt_d"] = str(foundation_bolt_d)
+    config["Machine"]["foundation_bolt_n"] = str(foundation_bolt_n)
+    config["Machine"]["foundation_bolt_PTH_d"] = str(foundation_bolt_PTH_d)
+    config["Machine"]["foundation_bolt_seat_d"] = str(foundation_bolt_seat_d)
+    config["Machine"]["foundation_flange_c1"] = str(foundation_flange_c1)
+    config["Machine"]["foundation_flange_c2"] = str(foundation_flange_c2)
+    config["Machine"]["bearing_connection_bolt_d"] = str(bearing_connection_bolt_d)
+    config["Machine"]["bearing_connection_bolt_PTH_d"] = str(bearing_connection_bolt_PTH_d)
+    config["Machine"]["bearing_connection_bolt_seat_d"] = str(bearing_connection_bolt_seat_d)
+    config["Machine"]["bearing_connection_flange_c1"] = str(bearing_connection_flange_c1)
+    config["Machine"]["bearing_connection_flange_c2"] = str(bearing_connection_flange_c2)
+    config["Machine"]["shell_connection_bolt_d"] = str(shell_connection_bolt_d)
+    config["Machine"]["shell_connection_bolt_PTH_d"] = str(shell_connection_bolt_PTH_d)
+    config["Machine"]["shell_connection_bolt_seat_d"] = str(shell_connection_bolt_seat_d)
+    config["Machine"]["shell_connection_flange_c1"] = str(shell_connection_flange_c1)
+    config["Machine"]["shell_connection_flange_c2"] = str(shell_connection_flange_c2)
+    config["Machine"]["dowel_pin_d"] = str(dowel_pin_d)
+    config["Machine"]["bearing_cover_bolt_d"] = str(bearing_cover_bolt_d)
+    config["Machine"]["seeker_cover_bolt_d"] = str(seeker_cover_bolt_d)
+    config["Machine"]["length_1"] = str(length_1)
+    config["Machine"]["length_2"] = str(length_2)
+    config["Machine"]["delta_1"] = str(delta_1)
+    config["Machine"]["delta_2"] = str(delta_2)
+
+    with open("./config.ini", "w") as configfile:
+        config.write(configfile)
 
 
 if __name__ == "__main__":
@@ -234,13 +241,20 @@ if __name__ == "__main__":
     Standard_reducer_con_bolt = pd.read_excel('./all_sheets/Standard_reducer_con_bolt.xls', sheet_name="Sheet1")
     train_data = np.array(Standard_reducer_con_bolt)
     Standard_reducer_con_bolt = train_data.tolist()
+    # 导入标准国标六角头螺栓
+    standard_bolt = pd.read_excel('./all_sheets/standard_bolt.xls', sheet_name="Sheet1")
+    train_data = np.array(standard_bolt)
+    standard_bolt = train_data.tolist()
 
-    # # 将数据输出到可视文件中
-    # output_file = open("Calculated_Data.txt", mode='w+')
-    # temp = sys.stdout
-    # sys.stdout = output_file
+    # 将数据输出到可视文件中
+    output_file = open("Calculated_Data.txt", mode='w+')
+    temp = sys.stdout
+    sys.stdout = output_file
     # 程序运行
     structure_design()
-    # # 返回输出状态
-    # sys.stdout = temp
-    # output_file.close()
+    machine_about_output()
+    print("▲以上部分所用螺钉均以 GB/T 5782-2000 及 GB/T 5783-2000 为设计基准，详见《机械设计课程设计》")
+    print("------------------机箱结构运算已结束-------------------")
+    # 返回输出状态
+    sys.stdout = temp
+    output_file.close()
