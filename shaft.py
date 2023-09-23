@@ -2,7 +2,6 @@ import configparser as cp
 import pandas as pd
 import numpy as np
 import sys
-from numpy import pi
 
 high_shaft_cal_d = 0.0  # 高速轴计算直径
 low_shaft_cal_d = 0.0  # 低速轴计算直径
@@ -35,6 +34,12 @@ len_low_3 = 0.0
 len_low_4 = 0.0
 len_low_5 = 0.0
 len_low_6 = 0.0
+bearing_ID_high = ""
+bearing_ID_low = ""
+bearing_high_D = 0.0  # 轴承外径
+bearing_low_D = 0.0
+bearing_high_T = 0.0  # 轴承厚度
+bearing_low_T = 0.0
 bearing_cover_high_D = 0.0  # 轴承端盖外径
 bearing_cover_low_D = 0.0
 
@@ -77,7 +82,8 @@ def shaft_length_design():
     global high_shaft_standard_d, len_high_1, len_high_2, len_high_3, len_high_4, len_high_5, len_high_6, \
         d_high_1, d_high_2, d_high_3, d_high_4, d_high_5, d_high_6, len_low_1, len_low_2, len_low_3, \
         len_low_4, len_low_5, len_low_6, d_low_1, d_low_2, d_low_3, d_low_4, d_low_5, d_low_6, \
-        bearing_cover_high_D, bearing_cover_low_D
+        bearing_cover_high_D, bearing_cover_low_D, bearing_ID_high, bearing_ID_low, bearing_high_D, bearing_low_D, \
+        bearing_high_T, bearing_low_T
 
     # 计算螺钉长度
     nail_len = 0.0
@@ -88,14 +94,14 @@ def shaft_length_design():
 
     # 计算高速轴
     # 第一段
-    len_high_1 = float(config["Belt"]["L_large_wheel"]) + nail_len
+    len_high_1 = l_large_wheel - 2
     d_high_1 = high_shaft_standard_d
     # 第二段
     d_high_2 = d_high_1 + 4
     base_rib_thickness = float(config["Machine"]["base_rib_thickness"])  # 调用一下机壳数据，这里是机座壁厚
     e = np.ceil(1.2 * bearing_cover_bolt_d)
     e = e if 5 <= e <= 8 else 8 if e > 8 else 5
-    len_high_2 = base_rib_thickness + e + nail_len
+    len_high_2 = base_rib_thickness + e + 2 + nail_len  # +2是预留调整垫片的空间
 
     # 高速轴轴承选用，顺带解决第三段和第六段直径问题
     bearing_high_T = 0
@@ -175,13 +181,13 @@ def shaft_length_design():
         coupling_L1_low = coupling_standard[lastone][3]
 
     # 第一段
-    len_low_1 = coupling_L1_low
+    len_low_1 = coupling_L1_low - 2
     d_low_1 = low_shaft_standard_d
     # 第二段
     d_low_2 = d_low_1 + 4
     e = np.ceil(1.2 * bearing_cover_bolt_d)
     e = e if 5 <= e <= 8 else 8 if e > 8 else 5
-    len_low_2 = base_rib_thickness + e + nail_len
+    len_low_2 = base_rib_thickness + e + 2 + nail_len
 
     # 低速轴轴承选用
     bearing_low_T = 0
@@ -246,22 +252,56 @@ def shaft_length_design():
     print("  (因第六节长度可直接作图得到，故省略)")
 
 
-def strength_check():
+def shaft_about_output():
 
-    global alpha
+    global high_shaft_standard_d, low_shaft_standard_d, high_shaft_cal_d, low_shaft_cal_d, high_shaft_design_d, \
+        low_shaft_design_d, len_high_1, len_high_2, len_high_3, len_high_4, len_high_5, len_high_6, \
+        d_high_1, d_high_2, d_high_3, d_high_4, d_high_5, d_high_6, len_low_1, len_low_2, len_low_3, \
+        len_low_4, len_low_5, len_low_6, d_low_1, d_low_2, d_low_3, d_low_4, d_low_5, d_low_6, \
+        bearing_cover_high_D, bearing_cover_low_D, bearing_ID_high, bearing_ID_low, bearing_high_D, bearing_low_D, \
+        bearing_high_T, bearing_low_T
 
-    # 高速轴危险截面距离轴承压力中心距离
-    # len_gear_2_bearing =
+    config["Shaft"]["high_shaft_cal_d"] = str(high_shaft_cal_d)  # 高速轴计算直径
+    config["Shaft"]["low_shaft_cal_d"] = str(low_shaft_cal_d)  # 低速轴计算直径
+    config["Shaft"]["high_shaft_design_d"] = str(high_shaft_design_d)  # 高速轴设计直径
+    config["Shaft"]["low_shaft_design_d"] = str(low_shaft_design_d)  # 低速轴设计直径
+    config["Shaft"]["high_shaft_standard_d"] = str(high_shaft_standard_d)  # 高速轴标准直径
+    config["Shaft"]["low_shaft_standard_d"] = str(low_shaft_standard_d)  # 低速轴标准直径
+    config["Shaft"]["d_high_1"] = str(d_high_1)  # 高速轴各段直径
+    config["Shaft"]["d_high_2"] = str(d_high_2)
+    config["Shaft"]["d_high_3"] = str(d_high_3)
+    config["Shaft"]["d_high_4"] = str(d_high_4)
+    config["Shaft"]["d_high_5"] = str(d_high_5)
+    config["Shaft"]["d_high_6"] = str(d_high_6)
+    config["Shaft"]["len_high_1"] = str(len_high_1)  # 高速轴各段长度
+    config["Shaft"]["len_high_2"] = str(len_high_2)
+    config["Shaft"]["len_high_3"] = str(len_high_3)
+    config["Shaft"]["len_high_4"] = str(len_high_4)
+    config["Shaft"]["len_high_5"] = str(len_high_5)
+    config["Shaft"]["len_high_6"] = str(len_high_6)
+    config["Shaft"]["d_low_1"] = str(d_low_1)  # 低速轴各段直径
+    config["Shaft"]["d_low_2"] = str(d_low_2)
+    config["Shaft"]["d_low_3"] = str(d_low_3)
+    config["Shaft"]["d_low_4"] = str(d_low_4)
+    config["Shaft"]["d_low_5"] = str(d_low_5)
+    config["Shaft"]["d_low_6"] = str(d_low_6)
+    config["Shaft"]["len_low_1"] = str(len_low_1)  # 低速轴各段长度
+    config["Shaft"]["len_low_2"] = str(len_low_2)
+    config["Shaft"]["len_low_3"] = str(len_low_3)
+    config["Shaft"]["len_low_4"] = str(len_low_4)
+    config["Shaft"]["len_low_5"] = str(len_low_5)
+    config["Shaft"]["len_low_6"] = str(len_low_6)
+    config["Shaft"]["bearing_ID_high"] = str(bearing_ID_high)
+    config["Shaft"]["bearing_ID_low"] = str(bearing_ID_low)
+    config["Shaft"]["bearing_high_D"] = str(bearing_high_D)  # 轴承外径
+    config["Shaft"]["bearing_low_D"] = str(bearing_low_D)
+    config["Shaft"]["bearing_high_T"] = str(bearing_high_T)  # 轴承厚度
+    config["Shaft"]["bearing_low_T"] = str(bearing_low_T)
+    config["Shaft"]["bearing_cover_high_D"] = str(bearing_cover_high_D)  # 轴承端盖外径
+    config["Shaft"]["bearing_cover_low_D"] = str(bearing_cover_low_D)
 
-    # 小齿轮处理论所受力
-    peripheral_force_high = 2 * T_highspeed / d_gear_highspeed  # 圆周力
-    radial_force_high = peripheral_force_high * np.tan(np.radians(alpha))  # 根据齿形角计算径向力
-
-    print("·轴的强度计算")
-    print("  对于直齿圆柱齿轮，理想状况下，减速器轴无轴向力，且轴上载荷方向与大小不变，故此处减速器轴向不传递弯矩")
-    print("  对于6000系列深沟球轴承，轴承内壁完全接触轴踢，故压力中心视为轴承中线")
-    print("  如下，仅校核危险截面处，即旋转件元件连接处的轴强度")
-    print("  1.高速轴部分")
+    with open("./config.ini", "w") as configfile:
+        config.write(configfile)
 
 
 if __name__ == "__main__":
@@ -288,6 +328,7 @@ if __name__ == "__main__":
     d_gear_shaft_high = float(config["Gear"]["d_gear_shaft_high"])
     b_gear_highspeed = float(config["Gear"]["b_highspeed"])
     b_gear_lowspeed = float(config["Gear"]["b_lowspeed"])
+    l_large_wheel = float(config["Belt"]["l_large_wheel"])
 
     # 导入标准六角头螺栓长度数据
     standard_bolt = pd.read_excel('./all_sheets/standard_bolt.xls', sheet_name="Sheet1")
@@ -309,7 +350,9 @@ if __name__ == "__main__":
     # 程序运行
     first_design()
     shaft_length_design()
-    strength_check()
+    shaft_about_output()
+    print("因轴套类零件力学计算关键数据缺失，故暂不更新，待专业人士补充")
+    print("-------------------轴结构运算已结束-------------------")
     # 返回输出状态
     sys.stdout = temp
     output_file.close()
