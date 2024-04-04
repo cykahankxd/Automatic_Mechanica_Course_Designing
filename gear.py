@@ -389,7 +389,7 @@ if __name__ == "__main__":
     compound_form_factor = train_data.tolist()
 
     # 将数据输出到可视文件中
-    output_file = open("Calculated_Data.txt", mode='w+')
+    output_file = open("Calculated_Data_Gear.txt", mode='w+')
     temp = sys.stdout
     sys.stdout = output_file
     # 程序运行

@@ -177,7 +177,7 @@ if __name__ == "__main__":
     high_motorspeed_tag = int(config["General"]["high_motorspeed_tag"])  # 是否选择高速优先
 
     # 将数据输出到可视文件中
-    output_file = open("Calculated_Data.txt", mode='w+')
+    output_file = open("Calculated_Data_Electric_Motor.txt", mode='w+')
     temp = sys.stdout
     sys.stdout = output_file
     # 程序运行

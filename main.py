@@ -1,4 +1,4 @@
-import electric_motor
+import subprocess
 import tkinter as tk
 import configparser as cp
 
@@ -10,7 +10,6 @@ class Auto_Class_Design(tk.Tk):
         self.geometry("240x235")
 
     # def motor_connect(self):
-
 
 
 if __name__ == "__main__":
@@ -27,7 +26,12 @@ if __name__ == "__main__":
     efficiency_total = efficiency_belt * (
                 efficiency_bearing ** 3) * efficiency_gear * efficiency_coupling * efficiency_roller
     # 记录数据并导出，用作后续运算
-    config["General"]["efficiency_total"] = efficiency_total
+    config["General"]["efficiency_total"] = str(efficiency_total)
     with open("./config.ini", "w") as configfile:
         config.write(configfile)
-
+    # 正式进行运算
+    subprocess.run(["python", "electric_motor.py"])
+    subprocess.run(["python", "belt.py"])
+    subprocess.run(["python", "gear.py"])
+    subprocess.run(["python", "shaft.py"])
+    subprocess.run(["python", "whole_machine.py"])

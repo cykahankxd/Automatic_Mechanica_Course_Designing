@@ -382,7 +382,7 @@ if __name__ == "__main__":
     belt_length_list = train_data.tolist()
 
     # 将数据输出到可视文件中
-    output_file = open("Calculated_Data.txt", mode='w+')
+    output_file = open("Calculated_Data_Belt.txt", mode='w+')
     temp = sys.stdout
     sys.stdout = output_file
     # 程序运行
