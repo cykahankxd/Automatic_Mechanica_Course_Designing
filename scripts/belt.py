@@ -13,7 +13,9 @@ class belt_compress:
         self.config.read("./config.ini")
 
         # 数据记录
-        self.K_A = float(self.config["Belt"]["K_A"])
+        self.work_time_everyday = float(self.config["General"]["work_time_everyday"])  # 每日工作时间
+        self.heavy_load_tag = float(self.config["General"]["heavy_load_tag"])  # 是否重载
+        self.load_change_level = float(self.config["General"]["load_change_level"])  # 载荷变动(从0~3依次变大)
         self.efficiency_belt = float(self.config["General"]["efficiency_belt"])
         self.efficiency_bearing = float(self.config["General"]["efficiency_bearing"])
         self.efficiency_gear = float(self.config["General"]["efficiency_gear"])
@@ -34,6 +36,7 @@ class belt_compress:
         self.i_total = float(self.config["Machine"]["i_total"])
         self.i_belt = float(self.config["Machine"]["i_belt"])
         self.i_gear = float(self.config["Machine"]["i_gear"])
+        self.K_A = 0.0
         self.belt_type = 'A'  # 带型
         self.P_design = 0.0  # 设计功率
         self.P_single_belt = 0.0  # 单个带额定传输功率
@@ -83,6 +86,12 @@ class belt_compress:
         sys.stdout = output_file
 
     def belt_type_choose(self):  # 选择V带型号
+        # 确定工况系数
+        self.K_A = 1 + (self.load_change_level + self.heavy_load_tag) * 0.1
+        if self.work_time_everyday >= 10:
+            self.K_A += 0.2 if self.work_time_everyday > 16 else 0.1
+        if self.load_change_level == 3 and self.heavy_load_tag == 1:
+            self.K_A += 0.1
         # 取V带类型
         self.P_design = self.P_motor * self.K_A
         select_parameters = 506.7 * (self.P_design - 0.8) + 357.5
@@ -93,6 +102,7 @@ class belt_compress:
             self.belt_type = 'Z'
         print("以下是V带传动部分")
         print("----------------------------------------------------")
+        print("根据工况，确定工况系数K_A为: %.1f", self.K_A)
 
     def data_update(self):  # 更新相关参数
 
@@ -169,7 +179,7 @@ class belt_compress:
         # 初定中心距及带基准长度
         center_distance_0 = 1.3 * (self.d_small + self.d_large)
         belt_base_len_0 = 2 * self.center_distance + pi * (self.d_small + self.d_large) / 2 + (
-                    (self.d_large - self.d_small) ** 2) / (
+                (self.d_large - self.d_small) ** 2) / (
                                   4 * center_distance_0)
 
         # 由表取标准值进行更正
@@ -243,7 +253,7 @@ class belt_compress:
         # 带速及轴上载荷
         self.belt_speed = pi * self.d_small * self.n_motor / 60000
         self.F_pull_0 = 500 * self.P_design / (self.belt_sum * self.belt_speed) * (
-                    2.5 / self.K_alpha - 1) + self.mass_per_unit * (self.belt_speed ** 2)
+                2.5 / self.K_alpha - 1) + self.mass_per_unit * (self.belt_speed ** 2)
         self.F_Q = 2 * self.F_pull_0 * self.belt_sum * np.sin(np.radians(self.alpha_small) / 2)
 
         # 初定轴孔径及轮毂宽度
@@ -285,6 +295,7 @@ class belt_compress:
         print("-------------------带轮运算已结束--------------------")
 
     def output_BeltAbout(self):
+        self.config["Belt"]["K_A"] = str(self.K_A)
         self.config["Belt"]["belt_type"] = self.belt_type
         self.config["Belt"]["P_design"] = str(self.P_design)
         self.config["Belt"]["P_single_belt"] = str(self.P_single_belt)
