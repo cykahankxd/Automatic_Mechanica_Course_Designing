@@ -1,15 +1,9 @@
-import subprocess
-import tkinter as tk
 import configparser as cp
-
-class Auto_Class_Design(tk.Tk):
-    def __init__(self):
-        super(Auto_Class_Design, self).__init__()
-        self.iconbitmap("./cover.ico")
-        self.title("Class Design Auto Spawner")
-        self.geometry("240x235")
-
-    # def motor_connect(self):
+import scripts.electric_motor
+import scripts.belt
+import scripts.gear
+import scripts.whole_machine
+import scripts.shaft
 
 
 if __name__ == "__main__":
@@ -30,8 +24,8 @@ if __name__ == "__main__":
     with open("./config.ini", "w") as configfile:
         config.write(configfile)
     # 正式进行运算
-    subprocess.run(["python", "electric_motor.py"])
-    subprocess.run(["python", "belt.py"])
-    subprocess.run(["python", "gear.py"])
-    subprocess.run(["python", "shaft.py"])
-    subprocess.run(["python", "whole_machine.py"])
+    scripts.electric_motor.electric_motor_start()
+    scripts.belt.belt_start()
+    scripts.gear.gear_start()
+    scripts.whole_machine.whole_machine_start()
+    scripts.shaft.shaft_start()
