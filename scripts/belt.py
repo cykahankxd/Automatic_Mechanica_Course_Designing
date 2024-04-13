@@ -102,7 +102,7 @@ class belt_compress:
             self.belt_type = 'Z'
         print("以下是V带传动部分")
         print("----------------------------------------------------")
-        print("根据工况，确定工况系数K_A为: %.1f", self.K_A)
+        print("根据工况，确定工况系数K_A为: %.1f" % self.K_A)
 
     def data_update(self):  # 更新相关参数
 
