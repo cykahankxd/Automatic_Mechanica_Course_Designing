@@ -40,8 +40,8 @@ class AMCD_GUI_Class(tk.Tk):
         self.efficiency_coupling = float(self.config["General"]["efficiency_coupling"])  # 联轴器传输效率
         self.efficiency_roller = float(self.config["General"]["efficiency_roller"])  # 滚筒传输效率
         self.work_time_everyday = float(self.config["General"]["work_time_everyday"])  # 每日工作时长
-        self.heavy_load_tag = float(self.config["General"]["heavy_load_tag"])  # 起动是否重载
-        self.load_change_level = float(self.config["General"]["load_change_level"])  # 载荷变化幅度
+        self.heavy_load_tag = int(self.config["General"]["heavy_load_tag"])  # 起动是否重载
+        self.load_change_level = int(self.config["General"]["load_change_level"])  # 载荷变化幅度
         self.highspeed_gear_material = self.config["Gear"]["highspeed_gear_material"]  # 小齿轮材料倾向
         self.lowspeed_gear_material = self.config["Gear"]["lowspeed_gear_material"]  # 大齿轮材料倾向
         self.efficiency_total = self.efficiency_belt * (
@@ -96,22 +96,43 @@ class AMCD_GUI_Class(tk.Tk):
         tk.Button(self.normal_mode, text="开始运算", font=("微软雅黑", 10), command=self.cal_start).grid(row=10, column=2)
         # 高级设置
         self.heavy_load_tag_tmp = tk.IntVar()
-        self.heavy_load_tag_check = tk.Checkbutton(self.advanced_mode, variable=self.heavy_load_tag_tmp, text="装置起动是否重载",
-                                                   font=("微软雅黑", 10), onvalue=1, offvalue=0, command=self.heavy_load_confirm)
+        self.heavy_load_tag_check = tk.Checkbutton(self.advanced_mode, variable=self.heavy_load_tag_tmp,
+                                                   text="装置起动是否重载",
+                                                   font=("微软雅黑", 10), onvalue=1, offvalue=0,
+                                                   command=self.heavy_load_confirm)
         self.heavy_load_tag_check.grid(row=1, column=1, sticky='w')
 
-        self.load_change_level_scale = tk.Scale(self.advanced_mode, from_=0, to=3, length=300, orient='horizontal',
-                                                label="载荷变动幅度(从0到3分别为平稳,轻微,较大,很大)", font=("微软雅黑", 10),
-                                                tickinterval=1, resolution=1, command=self.load_change_level_confirm)
-        self.load_change_level_scale.grid(row=2, column=1, sticky='w')
+        tk.Label(self.advanced_mode, text="载荷变动幅度", font=("微软雅黑", 10)).grid(
+            row=2, column=1, sticky='w')
+        self.load_change_level_tmp = tk.IntVar()
+        self.load_change_level_tmp.set(self.load_change_level)
+        tk.Radiobutton(self.advanced_mode, variable=self.load_change_level_tmp,
+                       text="平稳", value=0).grid(row=2, column=2, sticky='w')
+        tk.Radiobutton(self.advanced_mode, variable=self.load_change_level_tmp,
+                       text="小", value=1).grid(row=3, column=2, sticky='w')
+        tk.Radiobutton(self.advanced_mode, variable=self.load_change_level_tmp,
+                       text="较大", value=2).grid(row=4, column=2, sticky='w')
+        tk.Radiobutton(self.advanced_mode, variable=self.load_change_level_tmp,
+                       text="很大", value=3).grid(row=5, column=2, sticky='w')
 
-        metal_items = ['45钢淬火+回火', '45钢正火']
+        tk.Label(self.advanced_mode, text="小齿轮材料选择", font=("微软雅黑", 10)).grid(row=6, column=1, sticky='w')
+        self.highspeed_gear_material_tmp = tk.StringVar()
+        self.highspeed_gear_material_tmp.set(self.highspeed_gear_material)
+        tk.Radiobutton(self.advanced_mode, variable=self.highspeed_gear_material_tmp,
+                       text="45钢淬火+回火", value="45 quenched and tempered").grid(row=6, column=2, sticky='w')
+        tk.Radiobutton(self.advanced_mode, variable=self.highspeed_gear_material_tmp,
+                       text="45钢正火", value="45 normalizing").grid(row=7, column=2, sticky='w')
 
-        tk.Label(self.advanced_mode, text="小齿轮材料选择", font=("微软雅黑", 10)).grid(row=3, column=1, sticky='w')
+        tk.Label(self.advanced_mode, text="大齿轮材料选择", font=("微软雅黑", 10)).grid(row=8, column=1, sticky='w')
+        self.lowspeed_gear_material_tmp = tk.StringVar()
+        self.lowspeed_gear_material_tmp.set(self.lowspeed_gear_material)
+        tk.Radiobutton(self.advanced_mode, variable=self.lowspeed_gear_material_tmp,
+                       text="45钢淬火+回火", value="45 quenched and tempered").grid(row=8, column=2, sticky='w')
+        tk.Radiobutton(self.advanced_mode, variable=self.lowspeed_gear_material_tmp,
+                       text="45钢正火", value="45 normalizing").grid(row=9, column=2, sticky='w')
 
-        tk.Label(self.advanced_mode, text="大齿轮材料选择", font=("微软雅黑", 10)).grid(row=4, column=1, sticky='w')
-
-        tk.Button(self.advanced_mode, text="保存数据", font=("微软雅黑", 10), command=self.save_config).grid(row=10, column=1)
+        tk.Button(self.advanced_mode, text="保存数据", font=("微软雅黑", 10), command=self.save_config).grid(
+            row=10, column=1)
 
     def on_closing(self):
         if messagebox.askokcancel("退出", "要退出程序吗"):
@@ -119,15 +140,6 @@ class AMCD_GUI_Class(tk.Tk):
 
     def heavy_load_confirm(self):
         self.heavy_load_tag = self.heavy_load_tag_tmp.get()
-
-    def load_change_level_confirm(self, v):
-        self.load_change_level = v
-
-    def gear_material_translate(self, s):
-        if s == '45钢淬火+回火':
-            return '45 quenched and tempered'
-        if s == '45钢正火':
-            return '45 normalizing'
 
     def save_config(self):  # 记录数据并导出，用作后续运算
         self.config["General"]["F_belt"] = self.F_belt_entry.get()
@@ -140,13 +152,13 @@ class AMCD_GUI_Class(tk.Tk):
         self.config["General"]["efficiency_roller"] = self.efficiency_roller_entry.get()
         self.config["General"]["work_time_everyday"] = self.work_time_everyday_entry.get()
         self.config["General"]["heavy_load_tag"] = str(self.heavy_load_tag)
-        self.config["General"]["load_change_level"] = str(self.load_change_level)
-        self.config["Gear"]["highspeed_gear_material"] = self.gear_material_translate(self.highspeed_gear_material_list.get())
-        self.config["Gear"]["lowspeed_gear_material"] = self.gear_material_translate(self.lowspeed_gear_material_list.get())
+        self.config["General"]["load_change_level"] = str(self.load_change_level_tmp.get())
+        self.config["Gear"]["highspeed_gear_material"] = self.highspeed_gear_material_tmp.get()
+        self.config["Gear"]["lowspeed_gear_material"] = self.lowspeed_gear_material_tmp.get()
         # 再次计算总传动效率
         try:
-            self.efficiency_total = self.efficiency_belt * (
-                    self.efficiency_bearing ** 3) * self.efficiency_gear * self.efficiency_coupling * self.efficiency_roller  # 总传动效率
+            self.efficiency_total = self.efficiency_belt * (self.efficiency_bearing ** 3) * \
+                                    self.efficiency_gear * self.efficiency_coupling * self.efficiency_roller  # 总传动效率
         except:
             messagebox.showerror("错误", "输入数据有误！")
             return
